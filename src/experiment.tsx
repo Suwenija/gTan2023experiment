@@ -1,5 +1,5 @@
 /**
- * @title gTan2023experiment
+ * @title 実験用ページ
  * @description mesures the immediate costs to shuttle between inyaku words and homophonic loanwords.
  * @version 0.1.0
  *
@@ -22,7 +22,7 @@ import { initJsPsych } from "jspsych";
 export async function run({ assetPaths, input = {}, environment, title, version }) {
   const jsPsych = initJsPsych();
 
-  const timeline = [];
+  let timeline: any[] = [];
 
   // Preload assets
   timeline.push({
