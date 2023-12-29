@@ -13,7 +13,8 @@ import FullscreenPlugin from "@jspsych/plugin-fullscreen";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import { initJsPsych } from "jspsych";
-import React from "react";
+import React, { ReactComponentElement, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 
 /**
@@ -35,21 +36,21 @@ export async function run({ assetPaths, input = {}, environment, title, version 
                 <p>ボタンを押して先へお進みください。</p>
             </div>
         ),
-        choises: ["先へ進む"]
+        choices: ["先へ進む"]
     })
     timeline.push({
         type: HtmlButtonResponsePlugin,
         stimulus: renderToString(
             <div>
                 <p>実験に際して、以下のことに同意いただける場合は、ボタンを押して先にお進みください。</p>
-                <ul>
+                <ul className="text-left">
                     <li>本実験は、横浜翠嵐高校 G探究 2年 言語学班が行っております。</li>
                     <li>得たデータは、研究成果の一部として発表される可能性があります。</li>
-                    <li>個人情報は収集しません。また、実験者の意図によらず個人情報が入力された場合でも、それを無関係の第三者に公開することはありません。</li>
+                    <li>個人情報は収集しません。（実験者の意図によらず入力された場合でも、無関係の第三者に公開することはありません。）</li>
                 </ul>
             </div>
         ),
-        choises: ["同意する"]
+        choices: ["同意する"]
     })
 
     // Switch to fullscreen
@@ -66,49 +67,68 @@ export async function run({ assetPaths, input = {}, environment, title, version 
 
     // Metadata survey
     const gradeRadioInput = (num: string) => {
-        return <input type="radio" required id={"grade-" + num + "th"} name="grade" value={num + "th"}>翠嵐 {num} 期生</input>
+        const id = "grade-" + num + "th";
+        return <>
+            <input type="radio" id={id} name="grade" value={num + "th"} required />
+            <label htmlFor={id}>翠嵐 {num} 期生</label>
+        </>
     }
     const radioAnotherInput =
         (nameName: string, placeholder: string, label = "その他", subInputSuffix = "", freeInputType: "text" | "number" = "text") => {
+            const [freeInputDisabled, setFreeInputDisabled] = useState(true);
+            const [freeInputRequired, setFreeInputRequired] = useState(false);
             const freeInput =
-                <input disabled type={freeInputType} id={nameName+"-free"} name={nameName+"-free"} placeholder={placeholder}></input>;
+                <input type={freeInputType} id={nameName+"-free"} name={nameName+"-free"} placeholder={placeholder} disabled={freeInputDisabled} required={freeInputRequired} />;
             const toggleFree = (checked: boolean) => {
-                freeInput.props.disabled = !checked;
-                freeInput.props.required = checked;
+                setFreeInputDisabled(!checked);
+                setFreeInputRequired(checked);
             }
+            const id = nameName+"-another";
             const res =
-                <input type="radio" id={nameName+"-another"} name={nameName} value="another" onChange={() => toggleFree(this.checked)}>
-                    {label}:
-                    <span className="q-free">
-                        {freeInput}{subInputSuffix}
-                    </span>
-                </input>;
+                <>
+                    <input type="radio" id={id} name={nameName} value="another" onChange={(e) => toggleFree(e.target.checked)} required />
+                    <label htmlFor={id}>{label}:</label>
+                    <span className="q-free">{freeInput}{subInputSuffix}</span>
+                </>
             return res;
         };
     timeline.push({
         type: SurveyHtmlFormPlugin,
-        stimulus: renderToString(
-            <div>
-                <p>最後にアンケートにご協力ください：</p>
-                <fieldset id="q-grade">
-                    <legend>Q1. あなたが当てはまるものをお選びください。</legend>
-                    {gradeRadioInput("76")}
-                    {gradeRadioInput("77")}
-                    {gradeRadioInput("78")}
-                    {radioAnotherInput("grade", "所属等")}
-                </fieldset>
-                <fieldset id="q-mother-tongue">
-                    <legend>Q2. あなたの母語は？</legend>
-                    <input type="radio" id="mother-tongue-ja" name="mother-tongue" value="ja">日本語</input>
-                    {radioAnotherInput("mother-tongue", "○○語")}
-                </fieldset>
-                <fieldset id="q-is-first">
-                    <legend>Q3. 今回参加されたのは初めてですか？</legend>
-                    <input type="radio" id="is-first" name="is-first" value="first">初めて</input>
-                    {radioAnotherInput("is-first", "2", "2 回目以上", " 回目", "number")}
-                </fieldset>
-            </div>
+        html: renderToString(
+            <div id="survey-root"></div>
         ),
+        button_label: "送信する",
+        on_load: () => {
+            const rootDiv = document.getElementById("survey-root");
+            if (rootDiv === null) {
+                throw "Fatal internal error: root div not found.";
+            }
+            const root = createRoot(rootDiv);
+            root.render(
+                <>
+                    <p>最後にアンケートにご協力ください：</p>
+                    <fieldset id="q-grade">
+                        <legend>Q1. あなたが当てはまるものをお選びください。</legend>
+                        {gradeRadioInput("76")}
+                        {gradeRadioInput("77")}
+                        {gradeRadioInput("78")}
+                        {radioAnotherInput("grade", "所属等")}
+                    </fieldset>
+                    <fieldset id="q-mother-tongue">
+                        <legend>Q2. あなたの母語は？</legend>
+                        <input type="radio" id="mother-tongue-ja" name="mother-tongue" value="ja" required />
+                        <label htmlFor="mother-tongue-ja">日本語</label>
+                        {radioAnotherInput("mother-tongue", "○○語")}
+                    </fieldset>
+                    <fieldset id="q-is-first">
+                        <legend>Q3. 今回参加されたのは初めてですか？</legend>
+                        <input type="radio" id="is-first-yes" name="is-first" value="first" required />
+                        <label htmlFor="is-first-yes">初めて</label>
+                        {radioAnotherInput("is-first", "2", "2 回目以上", " 回目", "number")}
+                    </fieldset>
+                </>
+            )
+        }
     });
 
     await jsPsych.run(timeline);
