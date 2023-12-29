@@ -4,6 +4,10 @@
     background-color: #ffffff;
 }
 
+.text-left {
+    text-align: left;
+}
+
 .spr-root {
     &.spr-root-concealer-underline {
         .textline-segment::before,
