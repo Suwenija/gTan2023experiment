@@ -26,8 +26,8 @@ function isValidConcealer(obj): obj is typeof validConcealers[number] {
     return false;
 }
 
-type TextLine = Array<string | [string, DisplayType]>;
-function isValidTextLine(obj): obj is TextLine {
+type Textline = Array<string | [string, DisplayType]>;
+function isValidTextline(obj): obj is Textline {
     if (!Array.isArray(obj)) {
         return false;
     }
@@ -60,6 +60,25 @@ const info = {
 
 type Info = typeof info;
 
+const classNameTextlineSegmentDefault = "textline-segment";
+const classNameTextlineSegmentRevealed = "textline-segment-revealed";
+const classNameTextlineSegmentShown = "textline-segment-shown";
+const classNameTextlineSegmentHidden = "textline-segment-hidden";
+
+type ClassNameTextlineSegment =
+    typeof classNameTextlineSegmentDefault |
+    typeof classNameTextlineSegmentRevealed |
+    typeof classNameTextlineSegmentShown |
+    typeof classNameTextlineSegmentHidden;
+
+type TrialData = {
+    textline: Array<{
+        text: string,
+        displayType: DisplayType,
+        duration: number
+    }>
+}
+
 /**
  * **self-paced-reading**
  *
@@ -71,7 +90,7 @@ export class SelfPacedReadingPlugin implements JsPsychPlugin<Info> {
 
     trial(display_element: HTMLElement, trial: TrialType<Info>) {
         // initialize the DOM below:
-        if (!isValidTextLine(trial.textline)) {
+        if (!isValidTextline(trial.textline)) {
             throw("SPR: parameter textline is not valid");
         }
         const root = createRoot(display_element);
@@ -83,31 +102,87 @@ export class SelfPacedReadingPlugin implements JsPsychPlugin<Info> {
                 return defaultConcealer;
             }
         )();
-        const sprRootClasses = [
+        const sprRootClassName = [
             "spr-root",
             "spr-root-concealer-" + concealer
         ] as const;
-        const textLineSegments = trial.textline.map(
-            (s: TextLine[0]) => {
+        const textlineSegments = trial.textline.map(
+            (s: Textline[0]) => {
                 const text: string = (typeof s === "string") ? s : s[0];
                 const displayType: DisplayType = (typeof s === "string") ? "normal" : s[1];
                 switch (displayType) {
                     case "normal":
-                        return <span className="textline-segment" data-displayText={text}></span>;
+                        return <span className={classNameTextlineSegmentDefault} data-displayText={text}></span>;
                     case "shown":
-                        return <span className="textline-segment-shown" data-displayText={text}></span>;
+                        return <span className={classNameTextlineSegmentShown} data-displayText={text}></span>;
                     case "hidden":
-                        return <span className="textline-segment-hidden" data-displayText={text}></span>;
+                        return <span className={classNameTextlineSegmentHidden} data-displayText={text}></span>;
                 }
             }
         );
         root.render(
-            <div className={sprRootClasses.join(" ")}>
-                {textLineSegments}
+            <div className={sprRootClassName.join(" ")}>
+                {textlineSegments}
+                <div className="doc">スペースキーで進みます</div>
             </div>
         );
 
         // trial below:
-        
+        const currentIndex: [number] = [-1];
+        const timeHolder: [Date] = [new Date()];
+        const durationLog: (number | undefined)[] = []; // milliseconds
+        this.jsPsych.pluginAPI.getKeyboardResponse({
+            callback_function: () => {proceedTextline(textlineSegments, currentIndex, timeHolder, durationLog)},
+            valid_responses: [' '],
+            persist: false
+        });
+        const proceedTextline = (textlineSegments: React.JSX.Element[], currentIndex: [number], timeHolder: [Date], durationLog: (number | undefined)[]) => {
+            const currentTime = new Date();
+            const current = textlineSegments[currentIndex[0]];
+            if (current !== undefined) {
+                current.props.className = classNameTextlineSegmentDefault;
+                durationLog.push(currentTime.getTime() - timeHolder[0].getTime());
+            }
+            while (true) {
+                currentIndex[0]++;
+                if (currentIndex[0] >= textlineSegments.length) {
+                    finishTrial(durationLog);
+                    return;
+                }
+                const current = textlineSegments[currentIndex[0]];
+                if (current.props.className === classNameTextlineSegmentDefault) {
+                    timeHolder[0] = new Date();
+                    current.props.className = classNameTextlineSegmentRevealed;
+                    break;
+                }
+                durationLog.push(undefined);
+            }
+        };
+        const finishTrial = (durationLog) => {
+            if (!isValidTextline(trial.textline)) {
+                throw("Fatal internal error.");
+            }
+            const data: TrialData = {
+                textline: []
+            };
+            let i = 0;
+            while (true) {
+                const textlineSegment = trial.textline[i];
+                const [text, displayType]: [string, DisplayType] =
+                    typeof textlineSegment == "string" ?
+                    [textlineSegment, "normal"] :
+                    textlineSegment;
+                data.textline.push({
+                    text: text,
+                    displayType: displayType,
+                    duration: durationLog[i]
+                })
+                i++;
+                if (i >= trial.textline.length && i >= durationLog.length) {
+                    break;
+                }
+            }
+            this.jsPsych.finishTrial(data);
+        };
     }
 }
