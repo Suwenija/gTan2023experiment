@@ -4,32 +4,17 @@
     background-color: #ffffff;
 }
 
-.text-left {
+#survey-root fieldset ul li {
+    text-align: left;
+    list-style: none;
+}
+
+.welcoming-notes {
     text-align: left;
 }
 
-.spr-root {
-    &.spr-root-concealer-underline {
-        .textline-segment::before,
-        .textline-segment-hidden::before {
-            text-decoration: underline black;
-        }
-    }
-    &.spr-root-concealer-dash {
-        .textline-segment::before,
-        .textline-segment-hidden::before {
-            text-decoration: line-through black;
-        }
-    }
-    .textline-segment::before,
-    .textline-segment-hidden::before {
-        content: attr(data-displayText);
-        text-decoration-skip-ink: none;
-        color: rgba(0, 0, 0, 0);
-    }
-    .textline-segment-revealed::before,
-    .textline-segment-shown::before {
-        content: attr(data-displayText);
-        color: black;
-    }
+.q-free:has(input[disabled]) {
+    color: gray;
 }
+
+@import "./_spr.scss";
