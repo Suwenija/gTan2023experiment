@@ -26,8 +26,8 @@ function isValidConcealer(obj): obj is typeof validConcealers[number] {
     return false;
 }
 
-type Textline = Array<string | [string, DisplayType]>;
-function isValidTextline(obj): obj is Textline {
+export type Textline = Array<string | [string, DisplayType]>;
+export function isValidTextline(obj): obj is Textline {
     if (!Array.isArray(obj)) {
         return false;
     }
@@ -55,7 +55,11 @@ const info = {
         concealer: {
             type: ParameterType.STRING,
             default: defaultConcealer
-        }
+        },
+        header: {
+            type: ParameterType.STRING,
+            default: ""
+        },
     }
 } as const;
 
@@ -139,6 +143,7 @@ const SPRDiv: FC<{
     const triggerButton = <input id="spr-trigger" className="spr-trigger" type="button" value="ボタン" onClick={() => proceedTextline(timeHolder, durationLog)}/>
     return (
         <div className={sprRootClassName.join(" ")} data-windowPosition={windowPosition}>
+            {trial.header}
             <div className="spr-doc">スペースキーまたは下のボタンで進みます</div>
             <div className="spr-textline">
                 {textlineSegments}
