@@ -240,7 +240,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
     // Send data.
     timeline.push({
         type: SendToGoogleFormPlugin,
-        obj: [inyakuTimeline, jsPsych.data.get()],
+        obj: [inyakuSummary, jsPsych.data.get()],
         formId: "1FAIpQLScU9J3TMn3Vuz-qCN-CWjpyGdip3qAgqYSgfgNFbivzqxAlfw", // テスト用
         entryId: "933711398", // テスト用
     })
