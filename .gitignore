@@ -2,3 +2,4 @@ node_modules
 .jspsych-builder
 *.css
 *.css.map
+packaged
