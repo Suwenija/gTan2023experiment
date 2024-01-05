@@ -83,7 +83,6 @@ export const inyakuRandomTimeline = (termSets: TermSet[]) => {
             return res;
         })()
     };
-    // console.log(JSON.stringify(summary));
 
     const subExperiments = termSets.map(randomlyDetermineSubExperiment);
     let explanations: ([
@@ -138,7 +137,7 @@ export const inyakuRandomTimeline = (termSets: TermSet[]) => {
     const timeline: any[] = [];
 
     // 言葉の確認
-    const numOfExplanations = explanations.length;
+    const numOfExplanations = explanations.filter(e => !!e).length;
     if (numOfExplanations > 0) {
         timeline.push({
             type: HtmlButtonResponsePlugin,
@@ -148,7 +147,6 @@ export const inyakuRandomTimeline = (termSets: TermSet[]) => {
             choices: ["次へ"]
         });
         let explanationsTemp = explanations.map((e, originalIndex) => [originalIndex, e] as [typeof originalIndex, typeof e]);
-        console.log(explanationsTemp);
         while (explanationsTemp.length > 0) {
             const [
                 [
@@ -185,7 +183,7 @@ export const inyakuRandomTimeline = (termSets: TermSet[]) => {
                         <>
                             <p>
                                 次の言葉の意味をご確認ください。
-                                (No. {numOfExplanations - explanationsTemp.length + 1} / {numOfExplanations})
+                                (No. {summary.explanationOrder.length + 1} / {numOfExplanations})
                             </p>
                             <div className="term-explanation">
                                 <p className="text-left">{head(headIndexes[0])} ／ {head(headIndexes[1])}</p>

@@ -241,8 +241,8 @@ export async function run({ assetPaths, input = {}, environment, title, version 
     timeline.push({
         type: SendToGoogleFormPlugin,
         obj: [inyakuSummary, jsPsych.data.get()],
-        formId: "1FAIpQLScU9J3TMn3Vuz-qCN-CWjpyGdip3qAgqYSgfgNFbivzqxAlfw", // テスト用
-        entryId: "933711398", // テスト用
+        formId: "1FAIpQLSf7yAY6_8M73f-QOBwvqY8lJH4ozEONgoMTL5vw5r5zNRxDOQ",
+        entryId: "933711398",
     })
 
     // Ending phase
