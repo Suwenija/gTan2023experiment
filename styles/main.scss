@@ -1,0 +1,26 @@
+@import "~jspsych/css/jspsych.css";
+
+.jspsych-display-element {
+    background-color: #ffffff;
+}
+
+#survey-root fieldset ul li {
+    text-align: left;
+    list-style: none;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.q-free:has(input[disabled]) {
+    color: gray;
+}
+
+.term-explanation {
+    margin: .2em 0;
+    padding: 0 .5em;
+    border: black 1px solid;
+}
+
+@import "./_spr.scss";

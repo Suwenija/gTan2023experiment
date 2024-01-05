@@ -1,0 +1,58 @@
+.spr-doc {
+    border: skyblue 2px solid;
+    background-color: lightskyblue;
+    padding: .2em;
+}
+
+.spr-textline {
+    margin: 2em auto;
+    text-align: start;
+
+    span {
+        white-space: nowrap;
+    }
+}
+
+.spr-trigger {
+    font-size: 1.5em;
+}
+
+@mixin style-by-concealer($concealer) {
+    // currently only underline is supported.
+    text-decoration: underline black;
+    text-decoration-skip-ink: none;
+}
+
+@mixin segment-shown {
+    &::before {
+        content: attr(data-displayText);
+        color: black;
+    }
+}
+
+@mixin segment-hidden($concealer) {
+    &::before {
+        content: attr(data-displayText);
+        @include style-by-concealer($concealer);
+        color: rgba(0, 0, 0, 0);
+    }
+}
+
+.spr-root {
+    $concealer: attr(data-concealer);
+
+    .textline-segment-hidden {
+        @include segment-hidden($concealer);
+    }
+    .textline-segment-shown {
+        @include segment-shown;
+    }
+    .textline-segment {
+        &[data-revealed=true] {
+            @include segment-shown;
+        }
+        &[data-revealed=false] {
+            @include segment-hidden($concealer);
+        }
+    }
+}
