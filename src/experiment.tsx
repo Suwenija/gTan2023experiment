@@ -214,7 +214,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
             mainReplacer: "ホルモン",
             subReplacer: [
                 ["内分泌物質", "ナイブンピツ ブッシツ"],
-                ["放文", "ホウモン", "「放文」は、ホルモンを血管中に流す様子を、ボトルメールを川に流す様子にたとえた用語"],
+                ["放文", "ホウモン", "「放文」は、血管中にホルモンを流して伝達する様子を、川に手紙を流す様子にたとえた用語"],
             ],
             explanation: "内分泌腺から血液に分泌され、からだの活動を調整する物質。",
             textline:
