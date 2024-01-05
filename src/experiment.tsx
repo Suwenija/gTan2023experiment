@@ -146,12 +146,21 @@ export async function run({ assetPaths, input = {}, environment, title, version 
                     </fieldset>
                     <fieldset id="q-mother-tongue">
                         <legend>Q2. あなたの母語は？</legend>
-                        <SelectWithFreeInput nameName="mother-tongue" freeInputPlaceholder="○○語">
+                        <SelectWithFreeInput nameName="mother-tongue" freeInputPlaceholder="何語？">
                             <option value="ja">日本語</option>
                         </SelectWithFreeInput>
                     </fieldset>
                     <fieldset id="q-is-first">
-                        <legend>Q3. 今回参加されたのは初めてですか？</legend>
+                        <legend>Q3. どこでこの実験を知りましたか？</legend>
+                        <SelectWithFreeInput nameName="whereIntroduced" freeInputPlaceholder="どこで？">
+                            <option value="suiran77thLine">翠嵐 77 期のライングループ</option>
+                            <option value="suiran78thLine">翠嵐 78 期のライングループ</option>
+                            <option value="anotherSuiranLine">翠嵐のその他のライングループ</option>
+                            <option value="classroom">翠嵐の Google Classroom</option>
+                        </SelectWithFreeInput>
+                    </fieldset>
+                    <fieldset id="q-is-first">
+                        <legend>Q4. この実験に参加いただいたのは今回が初めてですか？</legend>
                         <SelectWithFreeInput nameName="is-first" freeInputPlaceholder="2" freeInputMin={2} freeInputStep={1} label="2 回目以上" freeInputSuffix=" 回目" freeInputType="number">
                             <option value="first">初めて</option>
                         </SelectWithFreeInput>
