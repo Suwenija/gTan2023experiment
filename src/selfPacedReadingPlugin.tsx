@@ -134,11 +134,12 @@ const SPRDiv: FC<{
             timeHolder[0] = currentTime;
             if (current+1 > numOfNormalSegment) {
                 finishTrial(durationLog);
+                return current;
             }
             return current+1;
-        })
+        });
     };
-    const triggerButton = <input id="spr-trigger" className="spr-trigger" type="button" value="ボタン" onClick={() => proceedTextline(timeHolder, durationLog)}/>
+    const triggerButton = <input id="spr-trigger" className="spr-trigger" type="button" value="次へ" onClick={() => proceedTextline(timeHolder, durationLog)}/>
     return (
         <div className={sprRootClassName.join(" ")} data-windowPosition={windowPosition}>
             {trial.header}
