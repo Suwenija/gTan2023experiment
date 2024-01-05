@@ -43,9 +43,9 @@ export async function run({ assetPaths, input = {}, environment, title, version 
     timeline.push({
         type: HtmlButtonResponsePlugin,
         stimulus: renderToString(
-            <div>
+            <div className="text-left">
                 <p>実験に際して、以下のことに同意いただける場合は、ボタンを押して先にお進みください。</p>
-                <ul className="text-left">
+                <ul>
                     <li>本実験は、横浜翠嵐高校 G探究 2年 言語学班が行っております。</li>
                     <li>得たデータは、研究成果の一部として発表される可能性があります。</li>
                     <li>個人情報は収集しません。（実験者の意図によらず入力された場合でも、無関係の第三者に公開することはありません。）</li>
@@ -77,10 +77,25 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         placeholder?: string,
         freeInputPlaceholder?: string,
         freeInputValue?: string,
+        freeInputMax?: number | undefined,
+        freeInputMin?: number | undefined,
+        freeInputStep?: number | undefined,
         label?: string,
         freeInputSuffix?: string,
-        freeInputType?: "text" | "number"
-    }> = ({ children, nameName, placeholder = "--選択--", freeInputPlaceholder, freeInputValue, label = "その他", freeInputSuffix = "", freeInputType = "text" }) => {
+        freeInputType?: "text" | "number",
+    }> = ({
+        children,
+        nameName,
+        placeholder = "--選択--",
+        freeInputPlaceholder,
+        freeInputValue,
+        freeInputMax = undefined,
+        freeInputMin = undefined,
+        freeInputStep = undefined,
+        label = "その他",
+        freeInputSuffix = "",
+        freeInputType = "text",
+    }) => {
         const valueFree = "FREE_DESCRIPTION";
         let [freeInputDisabled, setFreeInputDisabled] = useState(true);
         let [freeInputRequired, setFreeInputRequired] = useState(false);
@@ -100,7 +115,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
                 </select>
                 <div className="q-free">
                     自由記述：
-                    <input type={freeInputType} id={nameName + "-free"} name={nameName + "-free"} value={freeInputValue} placeholder={freeInputPlaceholder} disabled={freeInputDisabled} required={freeInputRequired} />
+                    <input type={freeInputType} id={nameName + "-free"} name={nameName + "-free"} value={freeInputValue} placeholder={freeInputPlaceholder} max={freeInputMax} min={freeInputMin} step={freeInputStep} disabled={freeInputDisabled} required={freeInputRequired} />
                     {freeInputSuffix}
                 </div>
             </>
@@ -137,7 +152,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
                     </fieldset>
                     <fieldset id="q-is-first">
                         <legend>Q3. 今回参加されたのは初めてですか？</legend>
-                        <SelectWithFreeInput nameName="is-first" freeInputValue="2" label="2 回目以上" freeInputSuffix=" 回目" freeInputType="number">
+                        <SelectWithFreeInput nameName="is-first" freeInputPlaceholder="2" freeInputMin={2} freeInputStep={1} label="2 回目以上" freeInputSuffix=" 回目" freeInputType="number">
                             <option value="first">初めて</option>
                         </SelectWithFreeInput>
                     </fieldset>
@@ -146,11 +161,11 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         }
     });
 
-    const [inyakuTimeline, minorTranslations] = inyakuRandomTimeline([
+    const [inyakuSummary, inyakuTimeline, minorTranslations] = inyakuRandomTimeline([
         {
             mainReplacer: "イデオロギー",
             subReplacer: [
-                ["観念形態", null],
+                ["観念形態", "カンネン ケイタイ"],
                 ["為道論", "イドウロン"],
             ],
             explanation: "その人またはある集団の歴史的・社会的立場にもとづいて作られた、根本的な考え。",
@@ -162,7 +177,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         {
             mainReplacer: "コントロール",
             subReplacer: [
-                ["制御", null],
+                ["制御", "セイギョ"],
                 ["管統", "カントウ"],
             ],
             explanation: "起こりうる問題に気をつけ、おさえること。",
@@ -174,7 +189,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         {
             mainReplacer: "サードパーティ",
             subReplacer: [
-                ["第三者", null],
+                ["第三者", "ダイサンシャ"],
                 ["参派", "サンパ"],
             ],
             explanation: "あるメーカーの作った電気製品などに使える部品や周辺機器を作っている、別のメーカー。",
@@ -186,7 +201,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         {
             mainReplacer: "パラダイム",
             subReplacer: [
-                ["枠組み的思想", null],
+                ["枠組み的思想", "わくぐみテキ シソウ"],
                 ["範題", "ハンダイ"],
             ],
             explanation: "ある時代・社会がひろく受け入れている、基本的な考え方。",
@@ -198,19 +213,19 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         {
             mainReplacer: "ホルモン",
             subReplacer: [
-                ["内分泌物質", null],
-                ["放文", "ホウモン"],
+                ["内分泌物質", "ナイブンピツ ブッシツ"],
+                ["放文", "ホウモン", "「放文」は、ホルモンを血管中に流す様子を、ボトルメールを川に流す様子にたとえた用語"],
             ],
             explanation: "内分泌腺から血液に分泌され、からだの活動を調整する物質。",
             textline:
-                "心身の|健康の|ためには、|{0}の|バランスを|崩さない|ように|する|ことが|大切です。"+
+                "心身の|健康の|ためには、|{0}の|バランスを|崩さない|ように|する|ことが|大切です。|"+
                 "これを|怠ると、|さまざまな|不調の|原因に|なりかねません。|"+
                 "日々の|健やかな|暮らしの|ために、|{1}の|調子を|意識した|食事や|睡眠を|心がけて|みませんか。"
         },
         {
             mainReplacer: "ロックダウン",
             subReplacer: [
-                ["都市封鎖", null],
+                ["都市封鎖", "トシ フウサ"],
                 ["籠断", "ロウダン"],
             ],
             explanation: "ある地域で外出制限や休業・休校などを強制すること。",
@@ -225,7 +240,7 @@ export async function run({ assetPaths, input = {}, environment, title, version 
     // Send data.
     timeline.push({
         type: SendToGoogleFormPlugin,
-        obj: jsPsych.data.get(),
+        obj: [inyakuTimeline, jsPsych.data.get()],
         formId: "1FAIpQLScU9J3TMn3Vuz-qCN-CWjpyGdip3qAgqYSgfgNFbivzqxAlfw", // テスト用
         entryId: "933711398", // テスト用
     })
@@ -236,19 +251,31 @@ export async function run({ assetPaths, input = {}, environment, title, version 
         stimulus: renderToString(
             <div className="text-left">
                 <p>実験にご協力いただきありがとうございました。</p>
-                <p>実験で使用した以下の言葉は、あまり普及していない訳語です。使用にはご注意ください。</p>
-                <ul>
-                    {
-                        minorTranslations.map(([translation, translationRuby, term]) => {
-                            return <li>{translation}〈{translationRuby}〉：「{term}」の訳語</li>
-                        })
-                    }
-                </ul>
+                {
+                    minorTranslations.length > 0 ?
+                    <>
+                        <p>実験で使用した以下の言葉は、ほとんど普及していない訳語です。使用にはご注意ください。</p>
+                        <ul>
+                            {
+                                minorTranslations.map(([translation, translationRuby, translationNote, term]) => {
+                                    return <li>
+                                        {translation}〈{translationRuby}〉：「{term}」の訳語{translationNote ? <>。{translationNote}</> : ""}
+                                    </li>
+                                })
+                            }
+                        </ul>
+                    </> :
+                    <></>
+                }
             </div>
         ),
-        choices: ["先へ進む"]
+        choices: [""],
+        on_load: () => {
+            (document.getElementsByClassName('jspsych-btn')[0]).style.display = "none";
+        }
     });
 
+    console.log(JSON.stringify(inyakuSummary));
     await jsPsych.run(timeline);
 
     // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this

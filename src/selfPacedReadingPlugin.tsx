@@ -83,8 +83,9 @@ type TrialData = {
     }>
 }
 
+type Simplify<T> = T extends any ? { [P in keyof T]: T[P] } : never;
 const SPRDiv: FC<{
-    trial: TrialType<Info>,
+    trial: Simplify<TrialType<Info> & {readonly textline: Textline}>,
     timeHolder: [Date] | [],
     durationLog: number[],
     finishTrial: (any) => void
@@ -103,9 +104,6 @@ const SPRDiv: FC<{
 
     const [windowPosition, setWindowPosition] = useState(-1);
     let i = 0;
-    if (!isValidTextline(trial.textline)) {
-        throw("textline is not valid.");
-    }
     const textlineSegments = trial.textline.map(
         (s: Textline[0]) => {
             const text: string = (typeof s === "string") ? s : s[0];
@@ -144,7 +142,7 @@ const SPRDiv: FC<{
     return (
         <div className={sprRootClassName.join(" ")} data-windowPosition={windowPosition}>
             {trial.header}
-            <div className="spr-doc">スペースキーまたは下のボタンで進みます</div>
+            <div className="spr-doc">{/*スペースキーまたは*/}下のボタンで進みます</div>
             <div className="spr-textline">
                 {textlineSegments}
             </div>
@@ -170,7 +168,7 @@ export class SelfPacedReadingPlugin implements JsPsychPlugin<Info> {
         const root = createRoot(display_element);
 
         const finishTrial = (durationLog) => {
-            console.log(durationLog)
+            // console.log(durationLog)
             if (!isValidTextline(trial.textline)) {
                 throw("Fatal internal error.");
             }
@@ -206,16 +204,16 @@ export class SelfPacedReadingPlugin implements JsPsychPlugin<Info> {
         const timeHolder: [Date] | [] = [];
         const durationLog: number[] = []; // milliseconds
         root.render(<SPRDiv trial={trial} timeHolder={timeHolder} durationLog={durationLog} finishTrial={finishTrial}></SPRDiv>);
-        const keyBoardBind = () => {
-            this.jsPsych.pluginAPI.getKeyboardResponse({
-                callback_function: () => {
-                    document.getElementById('spr-trigger')?.click();
-                    keyBoardBind();
-                },
-                valid_responses: [' '],
-                persist: false
-            });
-        }
-        keyBoardBind();
+        // const keyBoardBind = () => {
+        //     this.jsPsych.pluginAPI.getKeyboardResponse({
+        //         callback_function: () => {
+        //             document.getElementById('spr-trigger')?.click();
+        //             keyBoardBind();
+        //         },
+        //         valid_responses: [' '],
+        //         persist: false
+        //     });
+        // }
+        // keyBoardBind();
     }
 }
